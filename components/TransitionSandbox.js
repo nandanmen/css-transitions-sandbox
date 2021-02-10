@@ -1,6 +1,7 @@
 import React from 'react'
 import BezierEasing from 'bezier-easing'
 import { BsPlay, BsStop } from 'react-icons/bs'
+import { FaGithub } from 'react-icons/fa'
 import useInterval from '@use-it/interval'
 import { motion } from 'framer-motion'
 
@@ -49,7 +50,7 @@ export default function TransitionSandbox() {
   )
 
   return (
-    <div className="p-6 space-y-8 text-white bg-black border-4 border-gray-700 shadow-xl rounded-xl md:p-12">
+    <div className="relative p-6 space-y-8 text-white bg-black border-4 border-gray-700 shadow-xl rounded-xl md:p-12">
       <h1 className="font-semibold">{fps} FPS</h1>
       <div className="relative h-12 mr-12">
         {steps.map((step, index) => (
@@ -145,6 +146,30 @@ export default function TransitionSandbox() {
           </Field>
         </div>
       </form>
+      <footer className="w-full text-gray-500">
+        <ul className="flex items-end">
+          <li className="mr-4 text-2xl">
+            <ExternalLink href="https://github.com/narendrasss/css-transitions-sandbox">
+              <FaGithub />
+            </ExternalLink>
+          </li>
+          <li className="mr-4">
+            By {` `}
+            <ExternalLink href="https://narendras.io">Nanda</ExternalLink>.
+          </li>
+          <li className="max-w-sm ml-auto text-right">
+            Originally by{' '}
+            <ExternalLink href="https://twitter.com/JoshWComeau">
+              @JoshWComeau
+            </ExternalLink>{' '}
+            in his post on{' '}
+            <ExternalLink href="https://www.joshwcomeau.com/animation/css-transitions/">
+              CSS transitions
+            </ExternalLink>
+            . Check him out!
+          </li>
+        </ul>
+      </footer>
     </div>
   )
 }
@@ -169,6 +194,17 @@ function Field({ label, className = '', children }) {
       <span className="text-sm font-semibold uppercase">{label}</span>
       {children}
     </label>
+  )
+}
+
+function ExternalLink(props) {
+  return (
+    <a
+      className="font-semibold hover:text-red-500"
+      target="_blank"
+      rel="noreferrer"
+      {...props}
+    />
   )
 }
 

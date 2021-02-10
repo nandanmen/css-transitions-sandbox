@@ -8,7 +8,7 @@ export default function Home() {
         <title>CSS Transition Sandbox</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className="min-h-screen bg-gray-900 flex justify-center items-center">
+      <main className="flex flex-col items-center justify-center min-h-screen bg-gray-900">
         <TransitionSandbox />
       </main>
     </>
