@@ -1,14 +1,15 @@
 import Head from 'next/head'
+import TransitionSandbox from '../components/TransitionSandbox'
 
 export default function Home() {
   return (
     <>
       <Head>
-        <title>Create Next App</title>
+        <title>CSS Transition Sandbox</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main>
-        <h1>Hello world!</h1>
+      <main className="min-h-screen bg-gray-900 flex justify-center items-center">
+        <TransitionSandbox />
       </main>
     </>
   )
