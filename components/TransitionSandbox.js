@@ -6,15 +6,16 @@ import useInterval from '@use-it/interval'
 import { motion } from 'framer-motion'
 
 const easingFunctions = {
-  linear: BezierEasing(0, 0, 1, 1),
-  ease: BezierEasing(0.25, 0.1, 0.25, 1),
-  'ease-in': BezierEasing(0.42, 0, 1, 1),
-  'ease-out': BezierEasing(0, 0, 0.58, 1),
-  'ease-in-out': BezierEasing(0.42, 0, 0.58, 1),
-  'ease (supercharged)': BezierEasing(0.44, 0.21, 0, 1),
-  'ease-in (supercharged)': BezierEasing(0.75, 0, 1, 1),
-  'ease-out (supercharged)': BezierEasing(0.215, 0.61, 0.355, 1),
-  'ease-in-out (supercharged)': BezierEasing(0.645, 0.045, 0.355, 1),
+  linear: [0, 0, 1, 1],
+  ease: [0.25, 0.1, 0.25, 1],
+  'ease-in': [0.42, 0, 1, 1],
+  'ease-out': [0, 0, 0.58, 1],
+  'ease-in-out': [0.42, 0, 0.58, 1],
+  'ease (supercharged)': [0.44, 0.21, 0, 1],
+  'ease-in (supercharged)': [0.75, 0, 1, 1],
+  'ease-out (supercharged)': [0.215, 0.61, 0.355, 1],
+  'ease-in-out (supercharged)': [0.645, 0.045, 0.355, 1],
+  custom: null,
 }
 
 const shapes = ['circle', 'square']
@@ -23,10 +24,21 @@ export default function TransitionSandbox() {
   const [isPlaying, setIsPlaying] = React.useState(false)
   const [fps, setFps] = React.useState(60)
   const [easing, setEasing] = React.useState('ease-in-out (supercharged)')
+  const [{ x1, x2, y1, y2 }, setCubicBezier] = React.useState({
+    x1: 0,
+    x2: 0,
+    y1: 1,
+    y2: 1,
+  })
   const [ghostOpacity, setGhostOpacity] = React.useState(0.2)
   const [shape, setShape] = React.useState('circle')
 
-  const easingFunction = easingFunctions[easing]
+  const easingFunction = React.useMemo(() => BezierEasing(x1, y1, x2, y2), [
+    x1,
+    y1,
+    x2,
+    y2,
+  ])
   const steps = React.useMemo(() => getSteps(easingFunction, fps), [
     easingFunction,
     fps,
@@ -48,6 +60,13 @@ export default function TransitionSandbox() {
     },
     isPlaying ? 1000 / fps : null
   )
+
+  React.useEffect(() => {
+    if (easingFunctions[easing]) {
+      const [x1, y1, x2, y2] = easingFunctions[easing]
+      setCubicBezier({ x1, y1, x2, y2 })
+    }
+  }, [easing])
 
   return (
     <div className="relative p-6 space-y-8 text-white bg-black border-4 border-gray-700 shadow-xl rounded-xl md:p-12">
@@ -125,7 +144,7 @@ export default function TransitionSandbox() {
               value={easing}
               onChange={setEasing}
             />
-          </Field>{' '}
+          </Field>
           <Field label="Shape">
             <Select
               options={shapes}
@@ -134,7 +153,7 @@ export default function TransitionSandbox() {
               onChange={setShape}
             />
           </Field>
-          <Field label="Ghost Opacity">
+          <Field label="Ghost Opacity" style={{ flexGrow: 1 }}>
             <input
               type="range"
               min="0"
@@ -144,6 +163,21 @@ export default function TransitionSandbox() {
               onChange={(evt) => setGhostOpacity(evt.target.value)}
             />
           </Field>
+        </div>
+        <div className="flex space-x-4">
+          <CubicBezierEditor
+            value={{ x1, y1, x2, y2 }}
+            onChange={(curve) => {
+              if (easing !== 'custom') {
+                setEasing('custom')
+              }
+              setCubicBezier(curve)
+            }}
+          />
+          <CubicBezierCurve
+            curve={{ x1, x2, y1, y2 }}
+            progress={activeStepIndex / (steps.length - 1)}
+          />
         </div>
       </form>
       <footer className="w-full text-gray-500">
@@ -174,6 +208,103 @@ export default function TransitionSandbox() {
   )
 }
 
+// --
+
+function CubicBezierEditor({ value, onChange, style }) {
+  const { x1, y1, x2, y2 } = value
+  const handleChange = (evt) => {
+    onChange({
+      ...value,
+      [evt.target.name]: evt.target.value,
+    })
+  }
+  return (
+    <div
+      className="grid grid-cols-2 gap-4"
+      style={{ gridAutoRows: 'min-content', ...style }}
+    >
+      <Field label="x1">
+        <input
+          className="block w-full p-2 mt-2 bg-black border-2 border-gray-700 rounded-md ring-red-700 focus:outline-none focus:ring-4"
+          type="number"
+          name="x1"
+          value={x1}
+          onChange={handleChange}
+          step="0.01"
+        />
+      </Field>
+      <Field label="y1">
+        <input
+          className="block w-full p-2 mt-2 bg-black border-2 border-gray-700 rounded-md ring-red-700 focus:outline-none focus:ring-4"
+          type="number"
+          name="y1"
+          value={y1}
+          onChange={handleChange}
+          step="0.01"
+        />
+      </Field>
+      <Field label="x2">
+        <input
+          className="block w-full p-2 mt-2 bg-black border-2 border-gray-700 rounded-md ring-red-700 focus:outline-none focus:ring-4"
+          type="number"
+          name="x2"
+          value={x2}
+          onChange={handleChange}
+          step="0.01"
+        />
+      </Field>
+      <Field label="y2">
+        <input
+          className="block w-full p-2 mt-2 bg-black border-2 border-gray-700 rounded-md ring-red-700 focus:outline-none focus:ring-4"
+          type="number"
+          name="y2"
+          value={y2}
+          onChange={handleChange}
+          step="0.01"
+        />
+      </Field>
+    </div>
+  )
+}
+
+function CubicBezierCurve({ curve, style, progress }) {
+  const { x1, y1, x2, y2 } = curve
+  const currentY = BezierEasing(x1, y1, x2, y2)(progress)
+  const path = `M 0 0 C ${x1 * 1000} ${y1 * 1000}, ${x2 * 1000} ${
+    y2 * 1000
+  }, 1000 1000`
+  return (
+    <div
+      className="p-4 transform border-2 border-gray-700 rounded-lg"
+      style={style}
+    >
+      <svg viewBox="-20 -20 1040 1040" width="100%">
+        <g className="text-gray-600">
+          <motion.path
+            initial={{
+              d: path,
+            }}
+            animate={{
+              d: path,
+            }}
+            stroke="currentColor"
+            strokeWidth="8"
+            fill="transparent"
+          />
+        </g>
+        <g
+          className="text-red-700"
+          transform={`translate(${progress * 1000}, ${currentY * 1000})`}
+        >
+          <circle r="20" fill="currentColor" />
+        </g>
+      </svg>
+    </div>
+  )
+}
+
+// --
+
 function Select({ className = '', onChange, options, ...props }) {
   return (
     <select
@@ -188,9 +319,9 @@ function Select({ className = '', onChange, options, ...props }) {
   )
 }
 
-function Field({ label, className = '', children }) {
+function Field({ label, className = '', children, style }) {
   return (
-    <label className={`space-y-2 ${className}`}>
+    <label className={`space-y-2 ${className}`} style={style}>
       <span className="text-sm font-semibold uppercase">{label}</span>
       {children}
     </label>
