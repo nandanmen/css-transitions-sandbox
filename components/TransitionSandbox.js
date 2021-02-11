@@ -267,6 +267,8 @@ function CubicBezierEditor({ value, onChange, style }) {
   )
 }
 
+const BALL_RADIUS = 24
+
 function CubicBezierCurve({ curve, style, progress }) {
   const { x1, y1, x2, y2 } = curve
   const currentY = BezierEasing(x1, y1, x2, y2)(progress)
@@ -278,8 +280,13 @@ function CubicBezierCurve({ curve, style, progress }) {
       className="p-4 transform border-2 border-gray-700 rounded-lg"
       style={style}
     >
-      <svg viewBox="-20 -20 1040 1040" width="100%">
-        <g className="text-gray-600">
+      <svg
+        viewBox={`-${BALL_RADIUS} -${BALL_RADIUS} ${1000 + BALL_RADIUS * 2} ${
+          1000 + BALL_RADIUS * 2
+        }`}
+        width="100%"
+      >
+        <g className="text-gray-400">
           <motion.path
             initial={{
               d: path,
@@ -296,7 +303,7 @@ function CubicBezierCurve({ curve, style, progress }) {
           className="text-red-700"
           transform={`translate(${progress * 1000}, ${currentY * 1000})`}
         >
-          <circle r="20" fill="currentColor" />
+          <circle r={BALL_RADIUS} fill="currentColor" />
         </g>
       </svg>
     </div>
