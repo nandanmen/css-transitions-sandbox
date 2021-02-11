@@ -277,7 +277,7 @@ function CubicBezierCurve({ curve, style, progress }) {
   }, 1000 1000`
   return (
     <div
-      className="p-4 transform border-2 border-gray-700 rounded-lg"
+      className="max-w-sm p-4 transform border-2 border-gray-700 rounded-lg"
       style={style}
     >
       <svg
